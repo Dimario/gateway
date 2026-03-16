@@ -54,9 +54,8 @@ module.exports = (io) => {
 function isBotMentioned(message, botUsername) {
   if (!botUsername) return true; // if not configured — pass all messages
 
-  // In private chats and channels the bot receives all messages directly
+  // In private chats the bot receives all messages directly
   if (message.chat?.type === 'private') return true;
-  if (message.chat?.type === 'channel') return true;
 
   const entities = message.entities ?? [];
   const text = message.text ?? '';
