@@ -82,6 +82,18 @@ module.exports = (io) => {
     }
   });
 
+  // DELETE /tasks - delete all tasks
+  router.delete('/', async (req, res) => {
+    try {
+      const deleted = await redis.deleteAllTasks();
+      console.log(`[tasks] DELETE all: removed ${deleted} keys`);
+      res.json({ deleted });
+    } catch (err) {
+      console.error('[tasks] DELETE error:', err);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
   // GET /tasks/:id - get single task
   router.get('/:id', async (req, res) => {
     try {

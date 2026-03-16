@@ -56,6 +56,14 @@ redis.deleteTask = async (task) => {
   await redis.srem(`tasks:type:${task.type}`, task.id);
 };
 
+redis.deleteAllTasks = async () => {
+  const taskKeys = await redis.keys('task:*');
+  const typeKeys = await redis.keys('tasks:type:*');
+  const allKeys = [...taskKeys, ...typeKeys];
+  if (allKeys.length > 0) await redis.del(...allKeys);
+  return allKeys.length;
+};
+
 redis.getWaitingTasksByType = async (type) => {
   const ids = await redis.smembers(`tasks:type:${type}`);
   const tasks = [];
