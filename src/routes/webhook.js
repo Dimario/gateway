@@ -24,7 +24,10 @@ module.exports = (io) => {
       if (!isPrivate) {
         // Group/channel — mention OR keyword "пиздец"
         const isMentioned = isBotMentioned(message, BOT_USERNAME);
+
+        console.log('+++++++++ isMentioned ++++++++++', isMentioned, BOT_USERNAME, message);
         const hasKeyword = message.text.toLowerCase().includes('пиздец');
+        console.log('+++++++++ hasKeyword ++++++++++', hasKeyword);
         if (!isMentioned && !hasKeyword) return;
       }
 
