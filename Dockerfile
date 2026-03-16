@@ -2,7 +2,7 @@
 FROM node:20-slim AS builder
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 # Stage 2: distroless runtime (no shell, no package manager = minimal CVE surface)
 FROM gcr.io/distroless/nodejs20-debian12
