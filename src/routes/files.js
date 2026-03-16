@@ -17,4 +17,17 @@ router.get('/:filename', (req, res) => {
   res.sendFile(filePath);
 });
 
+// DELETE /files/:filename - delete uploaded file
+router.delete('/:filename', (req, res) => {
+  const filename = path.basename(req.params.filename);
+  const filePath = path.resolve(UPLOAD_DIR, filename);
+
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ error: 'File not found' });
+  }
+
+  fs.unlinkSync(filePath);
+  res.json({ deleted: filename });
+});
+
 module.exports = router;
