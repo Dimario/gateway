@@ -3,6 +3,15 @@ const { v4: uuidv4 } = require('uuid');
 const redis = require('../redis');
 const { BOT_USERNAME } = require('../config');
 
+const TRIGGER_WORDS = [
+  'пиздец',
+  'ларл', 
+  'larl', 
+  'lari', 
+  'денис', 
+  'денчик',  
+];
+
 module.exports = (io) => {
   const router = express.Router();
 
@@ -18,18 +27,10 @@ module.exports = (io) => {
 
       if (!message?.text) return;
 
-      // Private chat — always respond
-      const isPrivate = message.chat?.type === 'private';
+      const mentioned = isBotMentioned(message, BOT_USERNAME);
+      const triggered = hasTriggerWord(message.text, TRIGGER_WORDS);
 
-      if (!isPrivate) {
-        // Group/channel — mention OR keyword "пиздец"
-        const isMentioned = isBotMentioned(message, BOT_USERNAME);
-
-        console.log('+++++++++ isMentioned ++++++++++', isMentioned, BOT_USERNAME, message);
-        const hasKeyword = message.text.toLowerCase().includes('пиздец');
-        console.log('+++++++++ hasKeyword ++++++++++', hasKeyword);
-        if (!isMentioned && !hasKeyword) return;
-      }
+      if (!mentioned && !triggered) return;
 
       const task = {
         id: uuidv4(),
@@ -60,21 +61,21 @@ module.exports = (io) => {
  * - Private chat: always pass (no @mention needed)
  * - Group/supergroup: must have @mention entity
  */
-function isBotMentioned(message, botUsername) {
-  if (!botUsername) return true; // if not configured — pass all messages
+function hasTriggerWord(text, words) {
+  if (!words.length) return false;
+  const lower = text.toLowerCase();
+  return words.some((word) => lower.includes(word));
+}
 
-  // In private chats check only the keyword, not the mention
-  if (message.chat?.type === 'private') return true; // keyword checked separately
+function isBotMentioned(message, botUsername) {
+  if (!botUsername) return true;
 
   const entities = message.entities ?? [];
   const text = message.text ?? '';
 
-  // Check via entities (most reliable)
-  const hasMentionEntity = entities.some((entity) => {
+  return entities.some((entity) => {
     if (entity.type !== 'mention') return false;
     const mention = text.substring(entity.offset, entity.offset + entity.length);
     return mention.toLowerCase() === `@${botUsername.toLowerCase()}`;
   });
-
-  return hasMentionEntity;
 }

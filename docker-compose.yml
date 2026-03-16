@@ -5,6 +5,8 @@ services:
       - "3000:3000"
     volumes:
       - uploads:/uploads
+    env_file:
+      - .env
     environment:
       - PORT=3000
       - REDIS_URL=redis://redis:6379
