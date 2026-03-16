@@ -210,10 +210,73 @@ components:
           example:
             error: Internal server error
 
+  /webhook/telegram:
+    post:
+      summary: Telegram webhook
+      description: >
+        Эндпоинт для Telegram Bot API. Принимает Update-объект,
+        проверяет упоминание бота и создаёт задачу типа `telegram_message`.
+        Всегда возвращает 200 чтобы Telegram не повторял запрос.
+      tags: [Webhook]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Telegram Update object
+              properties:
+                update_id:
+                  type: integer
+                  example: 123456789
+                message:
+                  type: object
+                  properties:
+                    message_id:
+                      type: integer
+                    from:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        first_name:
+                          type: string
+                        username:
+                          type: string
+                    chat:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        type:
+                          type: string
+                          enum: [private, group, supergroup, channel]
+                        title:
+                          type: string
+                    text:
+                      type: string
+                      example: "@mybot привет!"
+                    entities:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                          offset:
+                            type: integer
+                          length:
+                            type: integer
+      responses:
+        '200':
+          description: Принято (всегда, чтобы Telegram не делал retry)
+
 tags:
   - name: Tasks
     description: Управление задачами
   - name: Files
     description: Загруженные файлы
+  - name: Webhook
+    description: Вебхуки внешних сервисов
   - name: System
     description: Системные ручки

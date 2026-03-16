@@ -9,6 +9,7 @@ const swaggerUi = require('swagger-ui-express');
 const { PORT, UPLOAD_DIR } = require('./config');
 const tasksRouter = require('./routes/tasks');
 const filesRouter = require('./routes/files');
+const webhookRouter = require('./routes/webhook');
 const setupSocket = require('./socket');
 
 const swaggerDocument = yaml.load(
@@ -33,6 +34,7 @@ app.get('/health', (req, res) => res.json({ status: 'ok' }));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/tasks', tasksRouter(io));
 app.use('/files', filesRouter);
+app.use('/webhook', webhookRouter(io));
 
 setupSocket(io);
 
