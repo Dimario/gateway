@@ -1,0 +1,22 @@
+{
+  "name": "local-server-gateway",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "ioredis": "^5.3.2",
+    "multer": "^1.4.5-lts.1",
+    "socket.io": "^4.7.5",
+    "uuid": "^10.0.0",
+    "swagger-ui-express": "^5.0.1",
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}

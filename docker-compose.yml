@@ -1,0 +1,28 @@
+services:
+  gateway:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - uploads:/uploads
+    environment:
+      - PORT=3000
+      - REDIS_URL=redis://redis:6379
+      - UPLOAD_DIR=/uploads
+      - NODE_OPTIONS=--max-old-space-size=150
+    depends_on:
+      - redis
+    restart: unless-stopped
+    mem_limit: 200m
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 64mb --maxmemory-policy allkeys-lru
+    mem_limit: 80m
+
+volumes:
+  uploads:
+  redis_data:
