@@ -18,9 +18,15 @@ module.exports = (io) => {
 
       if (!message?.text) return;
 
-      // Check if bot is mentioned
-      const isMentioned = isBotMentioned(message, BOT_USERNAME);
-      if (!isMentioned) return;
+      // Private chat — always respond
+      const isPrivate = message.chat?.type === 'private';
+
+      if (!isPrivate) {
+        // Group/channel — mention OR keyword "пиздец"
+        const isMentioned = isBotMentioned(message, BOT_USERNAME);
+        const hasKeyword = message.text.toLowerCase().includes('пиздец');
+        if (!isMentioned && !hasKeyword) return;
+      }
 
       const task = {
         id: uuidv4(),
@@ -54,8 +60,8 @@ module.exports = (io) => {
 function isBotMentioned(message, botUsername) {
   if (!botUsername) return true; // if not configured — pass all messages
 
-  // In private chats the bot receives all messages directly
-  if (message.chat?.type === 'private') return true;
+  // In private chats check only the keyword, not the mention
+  if (message.chat?.type === 'private') return true; // keyword checked separately
 
   const entities = message.entities ?? [];
   const text = message.text ?? '';
