@@ -13,7 +13,8 @@ module.exports = (io) => {
 
     try {
       const update = req.body;
-      const message = update?.message;
+      // In channels Telegram sends `channel_post` instead of `message`
+      const message = update?.message ?? update?.channel_post;
 
       if (!message?.text) return;
 
@@ -35,7 +36,8 @@ module.exports = (io) => {
 
       io.to('type:telegram_message').emit('task:new', task);
 
-      console.log(`[webhook] telegram task created: ${task.id} | chat: ${message.chat.id} | from: ${message.from?.username ?? message.from?.first_name}`);
+      const from = message.from?.username ?? message.from?.first_name ?? 'channel';
+      console.log(`[webhook] telegram task created: ${task.id} | chat: ${message.chat.id} | from: ${from}`);
     } catch (err) {
       console.error('[webhook] telegram error:', err);
     }
@@ -46,10 +48,15 @@ module.exports = (io) => {
 
 /**
  * Check if the bot is mentioned in the message.
- * Uses entities for accurate detection (handles @username in text).
+ * - Private chat: always pass (no @mention needed)
+ * - Group/supergroup: must have @mention entity
  */
 function isBotMentioned(message, botUsername) {
   if (!botUsername) return true; // if not configured — pass all messages
+
+  // In private chats and channels the bot receives all messages directly
+  if (message.chat?.type === 'private') return true;
+  if (message.chat?.type === 'channel') return true;
 
   const entities = message.entities ?? [];
   const text = message.text ?? '';
