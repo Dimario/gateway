@@ -6,6 +6,8 @@ const path = require('path');
 const yaml = require('js-yaml');
 const swaggerUi = require('swagger-ui-express');
 
+const morgan = require('morgan');
+
 const { PORT, UPLOAD_DIR } = require('./config');
 const tasksRouter = require('./routes/tasks');
 const filesRouter = require('./routes/files');
@@ -29,6 +31,7 @@ const io = new Server(server, {
 });
 
 app.use(express.json());
+app.use(morgan(':method :url :status :res[content-length]b :response-time ms'));
 
 // app.get('/', (req, res) => res.status(200).send(`
 
